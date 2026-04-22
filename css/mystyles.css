@@ -1,0 +1,312 @@
+/* =========================================
+   Utah Gardening Blog - styles.css
+   A hand-crafted stylesheet, made from scratch
+   ========================================= */
+ 
+/* --- CSS Variables / Design Tokens --- */
+:root {
+  --soil:      #5c3d1e;
+  --bark:      #8b5e3c;
+  --sage:      #7a9e7e;
+  --sage-dark: #4e7352;
+  --leaf:      #3b6e40;
+  --cream:     #f5f0e8;
+  --warm-tan:  #e8d8b8;
+  --sun:       #d4a84b;
+  --sky:       #b8d4e8;
+  --text-dark: #2e1f0e;
+  --text-mid:  #5c3d1e;
+  --text-light:#f5f0e8;
+}
+ 
+/* --- Reset & Base --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+ 
+html {
+  scroll-behavior: smooth;
+}
+ 
+body {
+  background-color: #e8d5b0;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(122,158,126,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(92,61,30,0.13) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23e8d5b0'/%3E%3Ccircle cx='1' cy='1' r='0.6' fill='%23c9b89030'/%3E%3C/svg%3E");
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--text-dark);
+  line-height: 1.75;
+  min-height: 100vh;
+}
+ 
+/* =========================================
+   DIV 1 — Page Header / Hero
+   ========================================= */
+#div-header {
+  background-color: var(--leaf);
+  background-image:
+    linear-gradient(135deg, var(--sage-dark) 0%, var(--leaf) 50%, var(--soil) 100%);
+  color: var(--text-light);
+  text-align: center;
+  padding: 60px 20px 50px;
+  border-bottom: 6px solid var(--soil);
+  position: relative;
+  overflow: hidden;
+}
+ 
+#div-header::before {
+  content: "🌿";
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.08;
+  top: -10px;
+  left: -20px;
+  transform: rotate(-15deg);
+}
+ 
+#div-header::after {
+  content: "🌻";
+  position: absolute;
+  font-size: 100px;
+  opacity: 0.08;
+  bottom: -10px;
+  right: 10px;
+  transform: rotate(10deg);
+}
+ 
+#div-header h1 {
+  font-family: 'Palatino Linotype', 'Palatino', 'Book Antiqua', serif;
+  font-size: 3rem;
+  letter-spacing: 2px;
+  text-shadow: 2px 3px 8px rgba(0,0,0,0.35);
+  margin-bottom: 10px;
+  color: var(--cream);
+}
+ 
+#div-header .tagline {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--warm-tan);
+  letter-spacing: 0.5px;
+}
+ 
+/* =========================================
+   DIV 2 — Navigation Bar
+   ========================================= */
+#div-nav {
+  background-color: var(--soil);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+ 
+#div-nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+ 
+#div-nav ul li a {
+  display: block;
+  padding: 14px 22px;
+  color: var(--warm-tan);
+  text-decoration: none;
+  font-family: 'Palatino Linotype', 'Palatino', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.8px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+ 
+#div-nav ul li a:hover {
+  background-color: var(--bark);
+  color: var(--cream);
+}
+ 
+/* =========================================
+   DIV 3 — Main Content Area
+   ========================================= */
+#div-main {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+}
+ 
+/* --- Section Titles --- */
+.section-title {
+  font-family: 'Palatino Linotype', 'Palatino', 'Book Antiqua', serif;
+  font-size: 1.9rem;
+  color: var(--leaf);
+  border-bottom: 3px solid var(--sun);
+  padding-bottom: 8px;
+  margin-bottom: 22px;
+  margin-top: 52px;
+}
+ 
+.section-title span {
+  margin-right: 8px;
+}
+ 
+/* --- Article Cards / Content Blocks --- */
+.card {
+  background-color: rgba(255,255,255,0.72);
+  border-left: 5px solid var(--sage);
+  border-radius: 4px;
+  padding: 22px 28px;
+  margin-bottom: 26px;
+  box-shadow: 2px 4px 16px rgba(92,61,30,0.10);
+}
+ 
+.card p {
+  font-family: 'Georgia', serif;
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+ 
+.card p:last-child {
+  margin-bottom: 0;
+}
+ 
+/* --- Pull Quote / Highlight Box --- */
+.pull-quote {
+  background-color: var(--sage);
+  color: var(--text-light);
+  font-family: 'Palatino Linotype', 'Palatino', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  padding: 20px 30px;
+  border-radius: 4px;
+  margin: 30px 0;
+  text-align: center;
+  letter-spacing: 0.3px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.12);
+}
+ 
+/* --- Lists --- */
+ol.main-list {
+  font-family: 'Georgia', serif;
+  font-size: 1.02rem;
+  color: var(--text-dark);
+  padding-left: 24px;
+  margin-top: 10px;
+}
+ 
+ol.main-list > li {
+  margin-bottom: 14px;
+  font-weight: bold;
+  color: var(--soil);
+}
+ 
+ol.main-list > li > ul.sub-list {
+  font-weight: normal;
+  color: var(--text-dark);
+  list-style-type: disc;
+  padding-left: 22px;
+  margin-top: 6px;
+}
+ 
+ol.main-list > li > ul.sub-list li {
+  margin-bottom: 5px;
+}
+ 
+/* --- Images --- */
+.photo-block {
+  text-align: center;
+  margin: 28px 0;
+}
+ 
+.photo-block img {
+  max-width: 100%;
+  border-radius: 6px;
+  border: 4px solid var(--warm-tan);
+  box-shadow: 3px 5px 18px rgba(92,61,30,0.18);
+}
+ 
+.photo-block figcaption {
+  font-family: 'Georgia', serif;
+  font-size: 0.88rem;
+  color: var(--bark);
+  font-style: italic;
+  margin-top: 8px;
+}
+ 
+/* --- Video Container --- */
+.video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 4px solid var(--warm-tan);
+  box-shadow: 3px 5px 18px rgba(92,61,30,0.18);
+  margin: 24px 0;
+}
+ 
+.video-wrap iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+ 
+/* --- Tableau Container --- */
+.tableau-wrap {
+  margin: 24px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 4px solid var(--warm-tan);
+  box-shadow: 3px 5px 18px rgba(92,61,30,0.18);
+  background: white;
+  text-align: center;
+}
+ 
+/* --- Footer --- */
+#div-footer {
+  background-color: var(--soil);
+  color: var(--warm-tan);
+  text-align: center;
+  padding: 28px 20px;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  border-top: 5px solid var(--bark);
+}
+ 
+#div-footer a {
+  color: var(--sun);
+  text-decoration: none;
+}
+ 
+#div-footer a:hover {
+  text-decoration: underline;
+}
+ 
+/* --- Anchor Target Offset (so sticky nav doesn't cover headings) --- */
+.anchor-target {
+  scroll-margin-top: 65px;
+}
+ 
+/* --- Responsive tweaks --- */
+@media (max-width: 600px) {
+  #div-header h1 {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.4rem;
+  }
+  #div-nav ul li a {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+}
+ 

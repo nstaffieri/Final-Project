@@ -1,0 +1,598 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seinfeld Daily Quote</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #f5c842;
+      --gold-dim: rgba(245,200,66,0.15);
+      --gold-border: rgba(245,200,66,0.25);
+      --cream: #f0ede4;
+      --cream-dim: rgba(240,237,228,0.6);
+      --bg: #0d0c14;
+      --bg-card: #13121e;
+      --bg-card2: #1b1928;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Playfair Display', Georgia, serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+
+    /* ── Background canvas ── */
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Scanline overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.06) 3px,
+        rgba(0,0,0,0.06) 4px
+      );
+    }
+
+    /* ── Main wrapper ── */
+    .stage {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      animation: fadeUp 1s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Network badge ── */
+    .nbc-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      animation: fadeUp .8s .1s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .nbc-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.7); }
+    }
+
+    .nbc-text {
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      opacity: .7;
+      text-transform: uppercase;
+    }
+
+    /* ── Show logo ── */
+    .show-logo {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: fadeUp .8s .15s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .logo-seinfeld {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: clamp(54px, 10vw, 88px);
+      letter-spacing: 6px;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow:
+        0 0 60px rgba(245,200,66,0.3),
+        0 0 120px rgba(245,200,66,0.1);
+      position: relative;
+      display: inline-block;
+    }
+
+    .logo-seinfeld::after {
+      content: 'SEINFELD';
+      position: absolute;
+      inset: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(245,200,66,0.2);
+      transform: translate(3px, 3px);
+      z-index: -1;
+    }
+
+    .logo-sub {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 8px;
+      color: var(--gold);
+      opacity: .45;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 4px;
+      padding: 52px 52px 40px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp .8s .25s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* Corner accents */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: .5;
+    }
+    .card::before { top: 14px; left: 14px; border-width: 1.5px 0 0 1.5px; }
+    .card::after  { bottom: 14px; right: 14px; border-width: 0 1.5px 1.5px 0; }
+
+    .card-inner-corners::before, .card-inner-corners::after {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: .5;
+    }
+    .card-inner-corners::before { top: 14px; right: 14px; border-width: 1.5px 1.5px 0 0; }
+    .card-inner-corners::after  { bottom: 14px; left: 14px; border-width: 0 0 1.5px 1.5px; }
+
+    /* Horizontal rule inside card */
+    .card-rule {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-border), transparent);
+      margin: 32px 0;
+    }
+
+    /* ── Date strip ── */
+    .date-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .date-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-border));
+    }
+
+    .date-line.right {
+      background: linear-gradient(to left, transparent, var(--gold-border));
+    }
+
+    .date-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      opacity: .7;
+      text-transform: uppercase;
+    }
+
+    /* ── Quote ── */
+    .quote-wrap {
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .open-quote {
+      font-size: 96px;
+      color: var(--gold);
+      line-height: .4;
+      opacity: .2;
+      display: block;
+      margin-bottom: 20px;
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    .quote-text {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(18px, 3vw, 24px);
+      line-height: 1.7;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+
+    .close-quote {
+      font-size: 96px;
+      color: var(--gold);
+      line-height: .2;
+      opacity: .2;
+      display: block;
+      margin-top: 8px;
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    /* ── Meta ── */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .meta-cell {
+      background: var(--bg-card2);
+      padding: 18px 12px;
+      text-align: center;
+    }
+
+    .meta-cell-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      opacity: .55;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .meta-cell-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: .5px;
+      line-height: 1.35;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      animation: fadeUp .8s .35s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .footer-text {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      color: var(--gold);
+      opacity: .3;
+      text-transform: uppercase;
+    }
+
+    .week-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .week-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      border: 1px solid rgba(245,200,66,0.35);
+      background: transparent;
+      transition: background .3s;
+    }
+
+    .week-dot.used {
+      background: rgba(245,200,66,0.4);
+      border-color: rgba(245,200,66,0.6);
+    }
+
+    .week-dot.today {
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 0 6px rgba(245,200,66,0.6);
+    }
+
+    @media (max-width: 540px) {
+      .card { padding: 36px 24px 28px; }
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<main class="stage">
+
+  <div class="nbc-strip">
+    <div class="nbc-dot"></div>
+    <span class="nbc-text">A Show About Nothing — NBC · 1989–1998</span>
+    <div class="nbc-dot"></div>
+  </div>
+
+  <div class="show-logo">
+    <div class="logo-seinfeld">SEINFELD</div>
+    <div class="logo-sub">Daily Quote</div>
+  </div>
+
+  <div class="card card-inner-corners">
+
+    <div class="date-row">
+      <div class="date-line"></div>
+      <span class="date-label" id="dateLabel">—</span>
+      <div class="date-line right"></div>
+    </div>
+
+    <div class="quote-wrap">
+      <span class="open-quote">&ldquo;</span>
+      <p class="quote-text" id="quoteText">Loading…</p>
+      <span class="close-quote">&rdquo;</span>
+    </div>
+
+    <div class="card-rule"></div>
+
+    <div class="meta-grid">
+      <div class="meta-cell">
+        <div class="meta-cell-label">Character</div>
+        <div class="meta-cell-value" id="quoteChar">—</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-cell-label">Season</div>
+        <div class="meta-cell-value" id="quoteSeason">—</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-cell-label">Episode</div>
+        <div class="meta-cell-value" id="quoteEpisode">—</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="week-dots" id="weekDots" title="Quotes used this week"></div>
+    <p class="footer-text" style="margin-top:10px;">New quote every day · No repeats within the week</p>
+  </div>
+
+</main>
+
+<script>
+const quotes = [
+  { text: "These pretzels are making me thirsty.", char: "Kramer", season: 3, episode: "The Alternate Side" },
+  { text: "No soup for you!", char: "The Soup Nazi", season: 7, episode: "The Soup Nazi" },
+  { text: "Yada yada yada.", char: "George Costanza", season: 8, episode: "The Yada Yada" },
+  { text: "I'm out there, Jerry, and I'm loving every minute of it!", char: "Kramer", season: 2, episode: "The Busboy" },
+  { text: "It's not a lie if you believe it.", char: "George Costanza", season: 6, episode: "The Beard" },
+  { text: "You know, we're living in a society!", char: "George Costanza", season: 4, episode: "The Chinese Restaurant" },
+  { text: "I don't want to be a pirate!", char: "Jerry Seinfeld", season: 7, episode: "The Puffy Shirt" },
+  { text: "She had man hands.", char: "Jerry Seinfeld", season: 8, episode: "The Bizarro Jerry" },
+  { text: "I was in the pool!", char: "George Costanza", season: 5, episode: "The Hamptons" },
+  { text: "A George divided against itself cannot stand!", char: "George Costanza", season: 6, episode: "The Foundation" },
+  { text: "Serenity now!", char: "Frank Costanza", season: 9, episode: "The Serenity Now" },
+  { text: "I want to be master of my domain.", char: "George Costanza", season: 4, episode: "The Contest" },
+  { text: "You are so good looking!", char: "Cosmo Kramer", season: 4, episode: "The Junior Mint" },
+  { text: "Maybe the dingo ate your baby.", char: "Elaine Benes", season: 9, episode: "The Stranded" },
+  { text: "A festivus for the rest of us!", char: "Frank Costanza", season: 9, episode: "The Strike" },
+  { text: "I'm Cosmo Kramer, the Assman!", char: "Cosmo Kramer", season: 6, episode: "The Fusilli Jerry" },
+  { text: "If every instinct you have is wrong, then the opposite would have to be right.", char: "Jerry Seinfeld", season: 5, episode: "The Opposite" },
+  { text: "World's colliding! George is getting very upset!", char: "George Costanza", season: 7, episode: "The Pool Guy" },
+  { text: "I'm disturbed, I'm depressed, I'm inadequate. I've got it all!", char: "George Costanza", season: 2, episode: "The Phone Message" },
+  { text: "I've driven women to lesbianism before, but never to a mental institution.", char: "George Costanza", season: 8, episode: "The Comeback" },
+  { text: "I'm the bad boy. I've never been the bad boy before.", char: "Jerry Seinfeld", season: 5, episode: "The Marine Biologist" },
+  { text: "Do you have any idea how much time I waste in this apartment?", char: "Cosmo Kramer", season: 3, episode: "The Keys" },
+  { text: "My mother's in the hospital, George.", char: "Jerry Seinfeld", season: 4, episode: "The Junior Mint" },
+  { text: "I'm not a lesbian. I hate men, but I'm not a lesbian.", char: "Elaine Benes", season: 6, episode: "The Smelly Car" },
+  { text: "I choose not to run.", char: "Jerry Seinfeld", season: 2, episode: "The Statue" },
+  { text: "You know I always wanted to pretend I was an architect.", char: "George Costanza", season: 3, episode: "The Limo" },
+  { text: "I need the secure packaging of the Titleist.", char: "Kramer", season: 5, episode: "The Marine Biologist" },
+  { text: "She's the one. She's the one I've been waiting for my whole life.", char: "George Costanza", season: 4, episode: "The Shoes" },
+  { text: "You're killing independent George!", char: "George Costanza", season: 7, episode: "The Pool Guy" },
+  { text: "I don't trust the guy. I think he reads my stuff.", char: "Jerry Seinfeld", season: 6, episode: "The Beard" },
+  { text: "Just when I think I'm out, they pull me back in.", char: "Frank Costanza", season: 7, episode: "The Rye" },
+  { text: "The sea was angry that day, my friends.", char: "George Costanza", season: 5, episode: "The Marine Biologist" },
+  { text: "You know what the message is? I will never be yours!", char: "George Costanza", season: 2, episode: "The Phone Message" },
+  { text: "I've got a lot of problems with you people!", char: "Frank Costanza", season: 9, episode: "The Strike" },
+  { text: "There's nothing more sophisticated than dipping your biscotti.", char: "Elaine Benes", season: 7, episode: "The Sponge" },
+];
+
+function getDayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getWeekKey() {
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${week}`;
+}
+
+function getQuoteIndex() {
+  const dayKey  = getDayKey();
+  const weekKey = getWeekKey();
+
+  const storedDay     = localStorage.getItem('sf_day');
+  const storedIndex   = localStorage.getItem('sf_index');
+  const storedWkKey   = localStorage.getItem('sf_week_key');
+  const storedWkUsed  = localStorage.getItem('sf_week_used');
+
+  if (storedDay === dayKey && storedIndex !== null) {
+    return parseInt(storedIndex, 10);
+  }
+
+  let usedThisWeek = [];
+  if (storedWkKey === weekKey && storedWkUsed) {
+    try { usedThisWeek = JSON.parse(storedWkUsed); } catch(e) {}
+  }
+
+  const available = quotes.map((_,i) => i).filter(i => !usedThisWeek.includes(i));
+  const pool = available.length > 0 ? available : quotes.map((_,i) => i);
+
+  // Deterministic seed from date string so the same day always shows the same quote
+  const seed = dayKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const idx  = pool[seed % pool.length];
+
+  usedThisWeek.push(idx);
+  if (usedThisWeek.length > 7) usedThisWeek = usedThisWeek.slice(-7);
+
+  localStorage.setItem('sf_day',        dayKey);
+  localStorage.setItem('sf_index',      idx);
+  localStorage.setItem('sf_week_key',   weekKey);
+  localStorage.setItem('sf_week_used',  JSON.stringify(usedThisWeek));
+
+  return idx;
+}
+
+// ── Render quote ──────────────────────────────────────────
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now    = new Date();
+
+const idx = getQuoteIndex();
+const q   = quotes[idx];
+
+document.getElementById('quoteText').textContent  = q.text;
+document.getElementById('quoteChar').textContent  = q.char;
+document.getElementById('quoteSeason').textContent = `Season ${q.season}`;
+document.getElementById('quoteEpisode').textContent = q.episode;
+document.getElementById('dateLabel').textContent  =
+  `${DAYS[now.getDay()]} · ${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+// ── Week-progress dots ────────────────────────────────────
+(function renderDots() {
+  const usedRaw = localStorage.getItem('sf_week_used');
+  const wkKey   = localStorage.getItem('sf_week_key');
+  const weekKey = getWeekKey();
+  let usedCount = 0;
+  if (wkKey === weekKey && usedRaw) {
+    try { usedCount = JSON.parse(usedRaw).length; } catch(e) {}
+  }
+
+  const container = document.getElementById('weekDots');
+  for (let i = 0; i < 7; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'week-dot';
+    if (i < usedCount - 1)  dot.classList.add('used');
+    if (i === usedCount - 1) dot.classList.add('today');
+    container.appendChild(dot);
+  }
+})();
+
+// ── Background canvas: floating logos ────────────────────
+(function initBg() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const LOGO_COUNT = 28;
+  const logos = [];
+
+  for (let i = 0; i < LOGO_COUNT; i++) {
+    logos.push({
+      x:    Math.random() * W,
+      y:    Math.random() * H,
+      vx:   (Math.random() - .5) * .18,
+      vy:   (Math.random() - .5) * .18,
+      rot:  Math.random() * Math.PI * 2,
+      vr:   (Math.random() - .5) * .003,
+      size: 18 + Math.random() * 26,
+      alpha: .03 + Math.random() * .055,
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (const l of logos) {
+      ctx.save();
+      ctx.globalAlpha = l.alpha;
+      ctx.translate(l.x, l.y);
+      ctx.rotate(l.rot);
+
+      // Draw oval + text "SEINFELD"
+      const rx = l.size * 1.9, ry = l.size * 1.1;
+      ctx.strokeStyle = '#f5c842';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f5c842';
+      ctx.font = `700 ${l.size * .7}px 'Oswald', sans-serif`;
+      ctx.letterSpacing = '1px';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SEINFELD', 0, 0);
+
+      ctx.restore();
+
+      // Move
+      l.x   += l.vx;
+      l.y   += l.vy;
+      l.rot += l.vr;
+
+      if (l.x < -rx * 2) l.x = W + rx;
+      if (l.x > W + rx * 2) l.x = -rx;
+      if (l.y < -ry * 2) l.y = H + ry;
+      if (l.y > H + ry * 2) l.y = -ry;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+</script>
+</body>
+</html>

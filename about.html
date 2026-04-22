@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nic Staffieri</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #FDF6EC;
+      color: #2C2C2A;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .site {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Hero */
+    .hero {
+      background: #FAEEDA;
+      border: 1px solid #FAC775;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-initials {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #EF9F27;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 600;
+      color: #412402;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 {
+      font-size: 30px;
+      font-weight: 600;
+      color: #412402;
+      margin-bottom: 0.3rem;
+    }
+
+    .hero .subtitle {
+      font-size: 14px;
+      color: #854F0B;
+      margin-bottom: 1.1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #633806;
+    }
+
+    /* Section cards */
+    .section-card {
+      background: #ffffff;
+      border: 1px solid #E8E4DC;
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #B4B2A9;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2C2C2A;
+      margin-bottom: 1rem;
+    }
+
+    /* Family */
+    .family-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #5F5E5A;
+    }
+
+    .sibling-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .sibling-pill {
+      background: #FAEEDA;
+      border: 1px solid #FAC775;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: #633806;
+      font-weight: 500;
+    }
+
+    /* Hobbies */
+    .hobbies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .hobby-card {
+      background: #F9F6F0;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hobby-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #FAEEDA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hobby-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .hobby-name {
+      font-size: 13px;
+      color: #2C2C2A;
+      font-weight: 500;
+    }
+
+    /* Places */
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .place-card {
+      background: #F9F6F0;
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+    }
+
+    .place-flag {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .place-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2C2C2A;
+    }
+
+    .place-type {
+      font-size: 12px;
+      color: #888780;
+      margin-top: 3px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      font-size: 13px;
+      color: #B4B2A9;
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 1.75rem 1.25rem; }
+      .section-card { padding: 1.25rem; }
+      .hero h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+
+    <!-- Hero / About Me -->
+    <div class="hero">
+      <div class="hero-initials">NS</div>
+      <h1>Nic Staffieri</h1>
+      <p class="subtitle">BYU student &middot; Future finance professional &middot; Pleasant Grove, UT</p>
+      <p>
+        I'm a college student at BYU planning to study finance at the Marriott School of Business.
+        I grew up in Arizona before moving to Pleasant Grove, Utah for high school, and recently
+        returned from a two-year LDS mission. I'm driven by faith, family, and a love for the outdoors.
+      </p>
+    </div>
+
+    <!-- Family -->
+    <div class="section-card">
+      <div class="section-label">Family</div>
+      <div class="section-title">The people who come first</div>
+      <p class="family-text">
+        Family has always been the most important thing in my life — full stop. I'm the second of
+        four kids, and growing up in a close-knit family shaped who I am. Whether it's watching
+        sports together or sitting around a good meal, those moments matter most.
+      </p>
+      <div class="sibling-row">
+        <div class="sibling-pill">Older sister</div>
+        <div class="sibling-pill">Nic &mdash; #2</div>
+        <div class="sibling-pill">Younger brother</div>
+        <div class="sibling-pill">Younger sister</div>
+      </div>
+    </div>
+
+    <!-- Interests & Hobbies -->
+    <div class="section-card">
+      <div class="section-label">Interests &amp; Hobbies</div>
+      <div class="section-title">What I love doing</div>
+      <div class="hobbies-grid">
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="8" cy="8" rx="6" ry="4" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M2 8 Q8 4 14 8" stroke="#854F0B" stroke-width="1.3" fill="none"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Football</span>
+        </div>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 13 L8 3 L13 13" stroke="#854F0B" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M5 10 L11 10" stroke="#854F0B" stroke-width="1.3"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Snowboarding</span>
+        </div>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 10 Q5 7 8 9 Q11 11 14 8" stroke="#854F0B" stroke-width="1.3" fill="none"/>
+              <path d="M2 13 Q5 10 8 12 Q11 14 14 11" stroke="#854F0B" stroke-width="1" fill="none" opacity="0.5"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Wake surfing</span>
+        </div>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="5" r="2.5" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M2 13 L8 7.5 L14 13" stroke="#854F0B" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Golfing</span>
+        </div>
+
+        <a class="hobby-card" href="fromscratch.html">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 3 Q10 5 10 8 Q10 11 8 13 Q6 11 6 8 Q6 5 8 3Z" stroke="#854F0B" stroke-width="1.3" fill="none"/>
+              <path d="M5 7 Q8 8.5 11 7" stroke="#854F0B" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Gardening</span>
+        </a>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="2" width="6" height="9" rx="3" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M8 11 L8 14" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M5.5 14 L10.5 14" stroke="#854F0B" stroke-width="1.3"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Working out</span>
+        </div>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="4" width="12" height="8" rx="1.5" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M5 4 L5 2.5" stroke="#854F0B" stroke-width="1.3"/>
+              <path d="M11 4 L11 2.5" stroke="#854F0B" stroke-width="1.3"/>
+              <circle cx="8" cy="8" r="1.5" fill="#854F0B"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Watching sports</span>
+        </div>
+
+        <div class="hobby-card">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 5 Q8 3 13 5 L12 12 Q8 14 4 12 Z" stroke="#854F0B" stroke-width="1.3" fill="none"/>
+              <path d="M6 8 Q8 9.5 10 8" stroke="#854F0B" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+          <span class="hobby-name">Good food</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Places Visited -->
+    <div class="section-card">
+      <div class="section-label">Places Visited</div>
+      <div class="section-title">Around the world</div>
+      <div class="places-grid">
+
+        <div class="place-card">
+          <span class="place-flag">🇪🇹</span>
+          <div class="place-name">Ethiopia</div>
+          <div class="place-type">East Africa</div>
+        </div>
+
+        <div class="place-card">
+          <span class="place-flag">🇮🇹</span>
+          <div class="place-name">Italy</div>
+          <div class="place-type">Southern Europe</div>
+        </div>
+
+        <div class="place-card">
+          <span class="place-flag">🇨🇷</span>
+          <div class="place-name">Costa Rica</div>
+          <div class="place-type">Central America</div>
+        </div>
+
+        <div class="place-card">
+          <span class="place-flag">🇧🇸</span>
+          <div class="place-name">Bahamas</div>
+          <div class="place-type">Caribbean</div>
+        </div>
+
+        <div class="place-card">
+          <span class="place-flag">🗽</span>
+          <div class="place-name">New York</div>
+          <div class="place-type">United States</div>
+        </div>
+
+        <div class="place-card">
+          <span class="place-flag">🏛️</span>
+          <div class="place-name">Washington DC</div>
+          <div class="place-type">United States</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      &copy; 2026 Nic Staffieri
+    </div>
+
+  </div>
+</body>
+</html>

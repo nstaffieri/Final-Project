@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nic's Likes and Dislikes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --like-color: #00e676;
+      --dislike-color: #ff4081;
+      --bg1: #1a0533;
+      --bg2: #0d1b6e;
+      --accent: #ffe600;
+      --ball-color: #ffe600;
+      --text-light: #fff;
+      --strike-color: #ff4081;
+    }
+
+    body {
+      background: radial-gradient(ellipse at 30% 20%, #2d0b6b 0%, #0d1b6e 50%, #0a0a2a 100%);
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      cursor: none;
+      user-select: none;
+    }
+
+    /* Starfield */
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Title */
+    #title {
+      position: fixed;
+      top: 14px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Boogaloo', cursive;
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      color: var(--accent);
+      text-shadow: 0 0 18px #ffe60088, 2px 2px 0 #ff008c;
+      letter-spacing: 2px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* HUD */
+    #hud {
+      position: fixed;
+      top: 58px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .hud-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .hud-label {
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.7;
+      color: #fff;
+    }
+    #score-display {
+      font-family: 'Boogaloo', cursive;
+      font-size: 2rem;
+      color: var(--accent);
+      text-shadow: 0 0 12px #ffe60088;
+    }
+    #strikes-display {
+      font-size: 1.5rem;
+      letter-spacing: 4px;
+    }
+
+    /* Canvas */
+    #gameCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+    }
+
+    /* Baskets */
+    .basket {
+      position: fixed;
+      bottom: 0;
+      width: 200px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 10px;
+      z-index: 8;
+      pointer-events: none;
+      transition: transform 0.12s;
+    }
+    #basket-like {
+      right: 30px;
+      background: linear-gradient(to top, #00c85388 0%, transparent 100%);
+      border-top: 3px solid var(--like-color);
+      border-left: 3px solid var(--like-color);
+      border-right: 3px solid var(--like-color);
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 0 30px #00e67644 inset, 0 0 20px #00e67622;
+    }
+    #basket-dislike {
+      left: 30px;
+      background: linear-gradient(to top, #c8005388 0%, transparent 100%);
+      border-top: 3px solid var(--dislike-color);
+      border-left: 3px solid var(--dislike-color);
+      border-right: 3px solid var(--dislike-color);
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 0 30px #ff408144 inset, 0 0 20px #ff408122;
+    }
+    .basket-label {
+      font-family: 'Boogaloo', cursive;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    #basket-like .basket-label { color: var(--like-color); text-shadow: 0 0 12px #00e67688; }
+    #basket-dislike .basket-label { color: var(--dislike-color); text-shadow: 0 0 12px #ff408188; }
+    .basket-icon { font-size: 2rem; }
+
+    /* Overlay screens */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,10,40,0.92);
+      backdrop-filter: blur(8px);
+      gap: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+
+    .overlay h1 {
+      font-family: 'Boogaloo', cursive;
+      font-size: clamp(2rem, 7vw, 4rem);
+      color: var(--accent);
+      text-shadow: 0 0 30px #ffe60099, 3px 3px 0 #ff008c;
+      text-align: center;
+    }
+    .overlay p {
+      font-size: 1.1rem;
+      color: #ccc;
+      text-align: center;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+    .overlay .stat-row {
+      display: flex;
+      gap: 36px;
+      margin-top: 8px;
+    }
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 16px 28px;
+      gap: 4px;
+    }
+    .stat-number {
+      font-family: 'Boogaloo', cursive;
+      font-size: 2.8rem;
+      color: var(--accent);
+    }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #aaa; }
+
+    .btn {
+      margin-top: 12px;
+      font-family: 'Boogaloo', cursive;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      padding: 14px 44px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #ffe600, #ff6d00);
+      color: #1a0533;
+      cursor: pointer;
+      box-shadow: 0 4px 24px #ffe60055;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:hover { transform: scale(1.06); box-shadow: 0 6px 36px #ffe60088; }
+    .btn:active { transform: scale(0.97); }
+
+    /* Floating word chips */
+    .word-chip {
+      position: fixed;
+      z-index: 6;
+      font-family: 'Boogaloo', cursive;
+      font-size: 1.3rem;
+      padding: 8px 22px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      pointer-events: none;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .word-chip.correct-flash {
+      background: rgba(0, 230, 118, 0.45) !important;
+      border-color: var(--like-color) !important;
+    }
+    .word-chip.wrong-flash {
+      background: rgba(255, 64, 129, 0.45) !important;
+      border-color: var(--dislike-color) !important;
+    }
+
+    /* Feedback popup */
+    .feedback-popup {
+      position: fixed;
+      z-index: 20;
+      font-family: 'Boogaloo', cursive;
+      font-size: 1.8rem;
+      pointer-events: none;
+      animation: popUp 0.8s ease forwards;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    @keyframes popUp {
+      0%  { opacity: 1; transform: translateY(0) scale(1); }
+      70% { opacity: 1; transform: translateY(-50px) scale(1.1); }
+      100%{ opacity: 0; transform: translateY(-80px) scale(0.8); }
+    }
+
+    /* Basket flash */
+    .basket-flash-like   { animation: flashLike   0.35s ease; }
+    .basket-flash-dislike{ animation: flashDislike 0.35s ease; }
+    @keyframes flashLike    { 0%,100%{box-shadow:0 0 30px #00e67644 inset;} 50%{box-shadow:0 0 80px #00e676cc inset;} }
+    @keyframes flashDislike { 0%,100%{box-shadow:0 0 30px #ff408144 inset;} 50%{box-shadow:0 0 80px #ff4081cc inset;} }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div id="title">🎉 Nic's Likes &amp; Dislikes 🎉</div>
+
+<div id="hud">
+  <div class="hud-block">
+    <span class="hud-label">Score</span>
+    <span id="score-display">0 / 5</span>
+  </div>
+  <div class="hud-block">
+    <span class="hud-label">Strikes</span>
+    <span id="strikes-display">🖤🖤🖤</span>
+  </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<div class="basket" id="basket-dislike">
+  <span class="basket-icon">👎</span>
+  <span class="basket-label">DISLIKES</span>
+</div>
+<div class="basket" id="basket-like">
+  <span class="basket-icon">👍</span>
+  <span class="basket-label">LIKES</span>
+</div>
+
+<!-- Start Screen -->
+<div class="overlay" id="start-screen">
+  <h1>Nic's Likes &amp;<br>Dislikes!</h1>
+  <p>Words will rain down from the sky. Catch them with your ball and drop them into the right basket!<br><br>
+  Score <strong style="color:var(--accent)">5 points</strong> to win — but 3 mistakes and it's game over! 💥</p>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:1rem;color:#ccc;">
+    <span>🟢 <strong style="color:var(--like-color)">Likes</strong> → right basket</span>
+    <span>🔴 <strong style="color:var(--dislike-color)">Dislikes</strong> → left basket</span>
+  </div>
+  <button class="btn" id="start-btn">LET'S PLAY! 🚀</button>
+</div>
+
+<!-- End Screen -->
+<div class="overlay" id="end-screen" style="display:none;">
+  <h1 id="end-title">🎉 You Win!</h1>
+  <p id="end-subtitle">You sorted Nic's world like a pro!</p>
+  <div class="stat-row">
+    <div class="stat-box">
+      <span class="stat-number" id="end-score">0</span>
+      <span class="stat-label">Points</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number" id="end-strikes">0</span>
+      <span class="stat-label">Strikes</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number" id="end-correct">0</span>
+      <span class="stat-label">Correct</span>
+    </div>
+  </div>
+  <p id="end-message" style="margin-top:8px;font-size:1rem;color:#aaa;"></p>
+  <button class="btn" id="restart-btn">PLAY AGAIN 🔄</button>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// 🔧 SWAP THESE WITH YOUR REAL LIKES & DISLIKES!
+const WORDS = [
+  { text: "Football",       isLike: true  },
+  { text: "Cottage Cheese",     isLike: false },
+  { text: "Snowboarding",      isLike: true  },
+  { text: "Hiking",     isLike: false },
+  { text: "Dogs",        isLike: true  },
+  { text: "Homework",    isLike: false },
+  { text: "Golf",      isLike: true  },
+  { text: "TV Shows", isLike: false },
+  { text: "Injera",      isLike: true  },
+  { text: "Rap Music",   isLike: false },
+  { text: "Sushi",     isLike: true  },
+  { text: "Cold Pizza",   isLike: false },
+  { text: "Road trips",  isLike: true  },
+  { text: "Alarm clocks",isLike: false },
+  { text: "Gardening",       isLike: true  },
+  { text: "Mosquitoes",  isLike: false },
+  { text: "Cleaning",       isLike: true  },
+  { text: "Running",  isLike: false }
+];
+
+const BALL_RADIUS   = 14;    // small = hard
+const FALL_SPEED    = 2.8;   // fast = hard (px per frame)
+const SPAWN_INTERVAL = 2200; // ms between new words
+const WIN_SCORE     = 5;
+const MAX_STRIKES   = 3;
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let score = 0, strikes = 0, correct = 0, gameActive = false;
+let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+let prevMouseX = mouseX, prevMouseY = mouseY;
+let chips = [];   // { el, x, y, vx, vy, word, done, width, height }
+let spawnTimer = null;
+let wordPool = [];
+
+// ─── STARFIELD ────────────────────────────────────────────────────────────────
+(function initStars() {
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const stars = Array.from({length:160},()=>({
+    x: Math.random()*c.width, y: Math.random()*c.height,
+    r: Math.random()*1.5+0.3, a: Math.random()
+  }));
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a += (Math.random()-0.5)*0.015;
+      s.a = Math.max(0.1,Math.min(1,s.a));
+      ctx.globalAlpha = s.a;
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── BALL (canvas) ────────────────────────────────────────────────────────────
+const ballCanvas = document.getElementById('gameCanvas');
+const bctx = ballCanvas.getContext('2d');
+ballCanvas.width = window.innerWidth;
+ballCanvas.height = window.innerHeight;
+
+function drawBall() {
+  bctx.clearRect(0,0,ballCanvas.width,ballCanvas.height);
+  if (!gameActive) return;
+  // glow
+  const grad = bctx.createRadialGradient(mouseX,mouseY,0,mouseX,mouseY,BALL_RADIUS*2.5);
+  grad.addColorStop(0,'rgba(255,230,0,0.35)');
+  grad.addColorStop(1,'rgba(255,230,0,0)');
+  bctx.beginPath(); bctx.arc(mouseX,mouseY,BALL_RADIUS*2.5,0,Math.PI*2);
+  bctx.fillStyle=grad; bctx.fill();
+  // ball
+  bctx.beginPath(); bctx.arc(mouseX,mouseY,BALL_RADIUS,0,Math.PI*2);
+  bctx.fillStyle='#ffe600'; bctx.shadowColor='#ffe600'; bctx.shadowBlur=18;
+  bctx.fill(); bctx.shadowBlur=0;
+  // shine
+  bctx.beginPath(); bctx.arc(mouseX-BALL_RADIUS*0.3,mouseY-BALL_RADIUS*0.3,BALL_RADIUS*0.35,0,Math.PI*2);
+  bctx.fillStyle='rgba(255,255,255,0.6)'; bctx.fill();
+}
+
+// ─── MOUSE ────────────────────────────────────────────────────────────────────
+document.addEventListener('mousemove', e => {
+  prevMouseX = mouseX; prevMouseY = mouseY;
+  mouseX = e.clientX; mouseY = e.clientY;
+});
+
+// ─── GAME LOOP ────────────────────────────────────────────────────────────────
+function gameLoop() {
+  if (!gameActive) return;
+  drawBall();
+
+  const ground = window.innerHeight - 10;
+  const bLike    = document.getElementById('basket-like');
+  const bDislike = document.getElementById('basket-dislike');
+
+  // Ball velocity this frame (for imparting momentum on hit)
+  const ballVx = mouseX - prevMouseX;
+  const ballVy = mouseY - prevMouseY;
+
+  chips.forEach(chip => {
+    if (chip.done) return;
+
+    // Apply gravity & move
+    chip.vy += 0.08; // subtle gravity drag to keep things interesting
+    chip.x  += chip.vx;
+    chip.y  += chip.vy;
+
+    // Lazy-init dimensions once element is rendered
+    if (!chip.width)  chip.width  = chip.el.offsetWidth  || 100;
+    if (!chip.height) chip.height = chip.el.offsetHeight || 40;
+
+    // ── Ball collision (circle vs AABB) ──────────────────────────────────────
+    const cx = chip.x + chip.width  / 2;
+    const cy = chip.y + chip.height / 2;
+
+    // Clamp ball center to chip rect, then find closest point
+    const closestX = Math.max(chip.x, Math.min(mouseX, chip.x + chip.width));
+    const closestY = Math.max(chip.y, Math.min(mouseY, chip.y + chip.height));
+    const distX = mouseX - closestX;
+    const distY = mouseY - closestY;
+    const dist  = Math.hypot(distX, distY);
+
+if (dist < BALL_RADIUS && dist > 0) {
+      // Contact normal points FROM closest point on chip AWAY from ball.
+      // distX/distY = mouseX - closestX, so negate to get chip-outward direction.
+      const nx = -distX / dist;
+      const ny = -distY / dist;
+
+      // Separate chip so it no longer overlaps the ball each frame (prevents sticking)
+      const overlap = BALL_RADIUS - dist + 1;
+      chip.x += nx * overlap;
+      chip.y += ny * overlap;
+
+      // Only reflect if chip is moving toward the ball (prevents re-collision tunnelling)
+      const approachSpeed = chip.vx * (-nx) + chip.vy * (-ny);
+      if (approachSpeed > 0) {
+        const dot = chip.vx * nx + chip.vy * ny;
+        chip.vx -= 2 * dot * nx;
+        chip.vy -= 2 * dot * ny;
+      }
+
+      // Add ball's own velocity as impulse (swing harder = more power)
+      chip.vx += ballVx * 0.55;
+      chip.vy += ballVy * 0.55;
+
+      // Clamp so chips don't fly off at insane speed
+      const speed = Math.hypot(chip.vx, chip.vy);
+      const maxSpeed = 18;
+      if (speed > maxSpeed) {
+        chip.vx = (chip.vx / speed) * maxSpeed;
+        chip.vy = (chip.vy / speed) * maxSpeed;
+      }
+
+      // Brief visual flash on hit
+      chip.el.style.borderColor = '#ffe600';
+      chip.el.style.boxShadow   = '0 0 20px #ffe60099';
+      setTimeout(() => {
+        if (!chip.done) {
+          chip.el.style.borderColor = '';
+          chip.el.style.boxShadow   = '';
+        }
+      }, 150);
+    }
+
+    // ── Wall bounce (left/right) ──────────────────────────────────────────────
+    if (chip.x < 0) { chip.x = 0; chip.vx = Math.abs(chip.vx) * 0.7; }
+    if (chip.x + chip.width > window.innerWidth) {
+      chip.x = window.innerWidth - chip.width;
+      chip.vx = -Math.abs(chip.vx) * 0.7;
+    }
+
+    positionChip(chip);
+
+    // ── Basket collision ──────────────────────────────────────────────────────
+    const chipRect = { l: chip.x, r: chip.x+chip.width, t: chip.y, b: chip.y+chip.height };
+    const lRect = bLike.getBoundingClientRect();
+    const dRect = bDislike.getBoundingClientRect();
+
+    if (overlaps(chipRect, lRect)) {
+      chip.done = true;
+      judgeWord(chip, true, bLike, 'like');
+      return;
+    }
+    if (overlaps(chipRect, dRect)) {
+      chip.done = true;
+      judgeWord(chip, false, bDislike, 'dislike');
+      return;
+    }
+
+    // ── Ground = miss ─────────────────────────────────────────────────────────
+    if (chip.y + chip.height >= ground) {
+      chip.done = true;
+      missedWord(chip);
+      removeChip(chip);
+    }
+  });
+
+  chips = chips.filter(c => !c.done);
+  requestAnimationFrame(gameLoop);
+}
+
+function overlaps(a, b) {
+  return a.l < b.right && a.r > b.left && a.t < b.bottom && a.b > b.top;
+}
+
+// ─── CHIP HELPERS ─────────────────────────────────────────────────────────────
+function positionChip(chip) {
+  chip.el.style.left = chip.x + 'px';
+  chip.el.style.top  = chip.y + 'px';
+}
+
+function removeChip(chip) {
+  chip.el.style.transition = 'opacity 0.3s';
+  chip.el.style.opacity = '0';
+  setTimeout(()=>chip.el.remove(), 350);
+}
+
+// ─── JUDGING ──────────────────────────────────────────────────────────────────
+function judgeWord(chip, placedInLike, basketEl, basketType) {
+  const isCorrect = (chip.word.isLike === placedInLike);
+
+  if (isCorrect) {
+    chip.el.classList.add('correct-flash');
+    correct++;
+    score++;
+    showFeedback('✅ +1', mouseX, mouseY, '#00e676');
+    flashBasket(basketEl, 'like');
+    updateHUD();
+    if (score >= WIN_SCORE) { setTimeout(endGame, 500, true); }
+  } else {
+    chip.el.classList.add('wrong-flash');
+    strikes++;
+    showFeedback('❌ Wrong!', mouseX, mouseY, '#ff4081');
+    flashBasket(basketEl, 'dislike');
+    updateHUD();
+    if (strikes >= MAX_STRIKES) { setTimeout(endGame, 500, false); }
+  }
+  setTimeout(()=>removeChip(chip), 300);
+}
+
+function missedWord(chip) {
+  strikes++;
+  showFeedback('💨 Missed!', chip.x + chip.el.offsetWidth/2, chip.y, '#ffaa00');
+  updateHUD();
+  if (strikes >= MAX_STRIKES) { setTimeout(endGame, 500, false); }
+}
+
+// ─── SPAWN ────────────────────────────────────────────────────────────────────
+function spawnWord() {
+  if (!gameActive) return;
+  if (wordPool.length === 0) wordPool = shuffle([...WORDS]);
+  const word = wordPool.pop();
+
+  const el = document.createElement('div');
+  el.className = 'word-chip';
+  el.textContent = word.text;
+  document.body.appendChild(el);
+
+  const margin = 80;
+  const x = margin + Math.random() * (window.innerWidth - margin*2 - 120);
+  const y = -50;
+
+  const chip = { el, x, y, vx: 0, vy: FALL_SPEED, word, done: false, width: 0, height: 0 };
+  positionChip(chip);
+  chips.push(chip);
+}
+
+// ─── HUD ──────────────────────────────────────────────────────────────────────
+const strikeSymbols = ['❤️','❤️','❤️'];
+function updateHUD() {
+  document.getElementById('score-display').textContent = `${score} / ${WIN_SCORE}`;
+  const remaining = MAX_STRIKES - strikes;
+  document.getElementById('strikes-display').textContent =
+    '❤️'.repeat(Math.max(0,remaining)) + '🖤'.repeat(Math.max(0,strikes));
+}
+
+// ─── FEEDBACK POPUP ───────────────────────────────────────────────────────────
+function showFeedback(text, x, y, color) {
+  const el = document.createElement('div');
+  el.className = 'feedback-popup';
+  el.textContent = text;
+  el.style.left = (x - 40) + 'px';
+  el.style.top  = (y - 20) + 'px';
+  el.style.color = color;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 900);
+}
+
+// ─── BASKET FLASH ─────────────────────────────────────────────────────────────
+function flashBasket(el, type) {
+  el.classList.remove('basket-flash-like','basket-flash-dislike');
+  void el.offsetWidth;
+  el.classList.add(type === 'like' ? 'basket-flash-like' : 'basket-flash-dislike');
+}
+
+// ─── GAME CONTROL ─────────────────────────────────────────────────────────────
+function startGame() {
+  score=0; strikes=0; correct=0;
+  chips.forEach(c=>c.el.remove()); chips=[];
+  wordPool=[];
+  updateHUD();
+  gameActive = true;
+
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('end-screen').style.display='none';
+
+  spawnWord();
+  spawnTimer = setInterval(spawnWord, SPAWN_INTERVAL);
+  requestAnimationFrame(gameLoop);
+}
+
+function endGame(won) {
+  gameActive = false;
+  clearInterval(spawnTimer);
+  chips.forEach(c=>{ c.done=true; removeChip(c); }); chips=[];
+  bctx.clearRect(0,0,ballCanvas.width,ballCanvas.height);
+
+  const screen = document.getElementById('end-screen');
+  document.getElementById('end-title').textContent   = won ? '🎉 You Win!' : '💀 Game Over!';
+  document.getElementById('end-subtitle').textContent = won
+    ? 'You know Nic better than Nic knows Nic!'
+    : 'Too many mistakes — but now you know Nic a little better!';
+  document.getElementById('end-score').textContent   = score;
+  document.getElementById('end-strikes').textContent = strikes;
+  document.getElementById('end-correct').textContent = correct;
+
+  const msgs = won
+    ? ['🏆 Absolute legend!','🧠 Big brain energy!','🎊 Certified Nic expert!']
+    : ['😬 Better luck next time!','📚 Study up on Nic!','🔁 Give it another shot!'];
+  document.getElementById('end-message').textContent = msgs[Math.floor(Math.random()*msgs.length)];
+
+  screen.style.display='flex';
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// ─── BUTTONS ──────────────────────────────────────────────────────────────────
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('restart-btn').addEventListener('click', startGame);
+
+// ─── RESIZE ───────────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  ballCanvas.width=window.innerWidth; ballCanvas.height=window.innerHeight;
+});
+</script>
+</body>
+</html>
